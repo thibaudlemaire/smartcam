@@ -1,0 +1,13 @@
+./exec/ffmpeg -y \
+-format_code Hp59 \
+-f decklink \
+-i 'DeckLink Mini Recorder 4K' \
+-format_code 23ps \
+-f decklink \
+-i 'DeckLink Mini Recorder' \
+-filter_complex \
+"[1:v] split=3 [input0][cropin][loopback];\
+ [cropin] crop=640:480:0:0 [cropout];[cropout] scale=1920:1080 [input1];\
+ [input0][input1][0:v] streamselect=inputs=3:map=0 [out]" \
+ -map "[loopback]" -r 10 -f v4l2 /dev/video1\
+ -map "[out]" -c:v libx264 out.mp4
